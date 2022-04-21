@@ -1,0 +1,46 @@
+## parameter files in json format, support python format comments (#)
+## It is strongly recommended that all the file path in this file should be absolute path
+## which will reduce possible errors (relative path is also supported).
+
+{
+    "phases":{
+        "begin":{
+            "phase":"P",
+            "time_offset":-150  ## in seconds, minus number means a few seconds before a phase
+        },
+        "end":{
+            "phase":"P",
+            "time_offset":150  ## in seconds, minus number means a few seconds before a phase
+        }
+    },
+
+    "distance_range": [30, 90],
+    "station_path": "D:/test/LG/station.csv",
+    #"station_path": "stations.csv",
+    "events": {
+        "path":"",   ## leave blank(""), and events will be downloaded from neic
+        "depth_range":[0, 6371],
+        "magnitude_range":[5.5,9.9],
+        "time_range":["2008-10-01","2008-12-01"]  ## time format should be "yyyy-mm-dd"
+    },
+
+    ##-------old options, deleted----------method to add event information to data(not implimented yet),  
+    #"add_event_head_method":"sac",
+    ##-------old options, deleted-------
+    "travel_time_tool":"Taup",   ### Taup or ttimes, now only support Taup in obspy
+
+    #------------ data_apply_mode: per_station or per_event.-----------
+    # For per_station, data requests will be sent by station, and the file will be arraged by station,
+        # 下载数据后添加时间信息，需要自行编程
+    # For per_event, data requests will be sent by event, and the file will be arraged by event
+    "data_apply_mode":"per_station",
+
+    #top diretory to store the processed data
+    "output_dir":"d:/output",
+
+    #top directory contains the input data
+    "input_dir": "d:/test",
+
+    ##output data format, such as sac, segy, etc.
+    "output_data_format":"sac"  
+}

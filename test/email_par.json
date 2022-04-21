@@ -1,0 +1,23 @@
+{
+    "sender":"aishenliwei@163.com",
+    #"receiver":"1965561927@qq.com",
+    "receiver":"breq_fast@iris.washington.edu",
+    "subject":"breq_fast request",
+    "smtpserver":"smtp.163.com",
+    "username":"aishenliwei",
+    "password":"IORTELCELSGQCMTC",
+    "prefix":"begin_phase",
+    "head":{
+        ".NAME":"livyS",
+        ".INST": "",
+        ".MAIL": "",
+        ".EMAIL": "aishenliwei@163.com",
+        ".PHONE": "",
+        ".FAX": "",
+        ".MEDIA:": "FTP",
+        ".ALTERNATE MEDIA:": "",
+        ".ALTERNATE MEDIA:": "",
+        ".FROM":"",
+        ".QUALITY":"B"
+    }
+}
