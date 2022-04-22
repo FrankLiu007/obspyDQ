@@ -1,5 +1,5 @@
-# SeisDQ 
-<b>Sei</b>smic <b>D</b>ata <b>Q</b>uery
+# obspyDQ 
+obspyDQ <b>D</b>ata <b>Q</b>uery
 
 >SeisDQ is a flexible seismic framework to fetch seismic data from online or local database.
 It can be implimented easily for other purpose.
