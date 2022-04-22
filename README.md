@@ -3,7 +3,7 @@ obspyDQ <b>D</b>ata <b>Q</b>uery
 
 >SeisDQ is a flexible seismic framework to fetch seismic data from online or local database.
 It can be implimented easily for other purpose.
-##A Brief history  
+## A Brief history  
 - GetEvent.py
 > When I was a graduate student, I used to process raw seismic data recorded by reftek rt130. The first step is convert all data to miniseed and then event data was cutted. I decided to write a script to directly fetch raw data from data achive (GetEvent.py).
 
