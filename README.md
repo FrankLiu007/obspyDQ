@@ -35,7 +35,8 @@ At last, I decided to refactor the code.
     python iris_breq.py --par iris.json
     python reftek_test.py --par reftek.json
 ```
->  change and run iris_breq.py:
+please note, for reftek data, I use Z, N, E component for stream1, stream2, stream3 as default  
+
     
 
 ### implimention
