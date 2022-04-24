@@ -147,7 +147,7 @@ def arcfetch(t1, t2, station):
         return  tr
 
     for f in file_list:
-        tr+=obspy.read(f)
+        tr+=obspy.read(f,  component_codes=["Z","N","E"])
     tr.merge(method=1, interpolation_samples=0)
 
     T1=obspy.UTCDateTime(t1.replace(tzinfo=timezone.utc).timestamp() )
