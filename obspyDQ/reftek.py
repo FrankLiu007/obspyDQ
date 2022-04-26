@@ -1,16 +1,11 @@
-import subprocess
 import os
-import sys
 import pexpect
 import obspy
-from obspyDQ import *
-from obspyDQ.utils import station, event, common
+import numpy as np
+
 from datetime import datetime, timezone, timedelta
 import glob
 
-
-# def check_dir():
-#     pass
 
 def scan_data_holding(path):
     result=[]
@@ -65,6 +60,11 @@ def fetch_data(pool):
 
             p=os.path.join(out_path,  station["network"] +"."+ station["name"] + "." + t1.strftime("%Y%j%H%M%S"))
             add_sac_head(tr, station, event)
+
+            ##for masked trace data
+            for trace in tr:
+                if isinstance(trace.data, np.ma.masked_array):
+                    tr.data = tr.data.filled()
             tr.write(p+".sac", format="SAC")
         elif out_format.lower().strip() == "segy":
             pass
