@@ -35,6 +35,9 @@ At last, I decided to refactor the code.
     python iris_breq.py --par iris.json
     python reftek_test.py --par reftek.json
 ```
+for reftek test, please make sure the reftek utility are available (arcfetch, pas2sac, pas2segy et.,). 
+The obspy can read reftek data, but not fully implemented yet.
+
 please note, for reftek data, I use Z, N, E component for stream1, stream2, stream3 as default  
 
     

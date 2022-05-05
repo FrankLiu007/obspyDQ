@@ -5,7 +5,7 @@ import numpy as np
 
 from datetime import datetime, timezone, timedelta
 import glob
-
+import subprocess
 
 def scan_data_holding(path):
     result=[]
@@ -27,9 +27,15 @@ def fetch_data(pool):
     out_dir = pool.pars['output_dir']
     out_format = pool.pars['output_data_format']
 
-    for key, station in  pool.stations.items():
-        station["local_data_holding"]=scan_data_holding(os.path.join(in_dir, station["network"].strip(), station["name"].strip()))
-   
+    ##tempory diretory to store
+    pool.pars["tmp_dir"] = "__reftek_temp_dir__"
+    if not os.path.exists(pool.pars["tmp_dir"]):
+        os.makedirs(pool.pars["tmp_dir"])
+
+    #for key, station in  pool.stations.items():
+
+        ##do not need anymore at present
+        #station["local_data_holding"]=scan_data_holding(os.path.join(in_dir, station["network"].strip(), station["name"].strip()))
 
     for sId, eId in pool.all_data:
         station = pool.stations[sId]
@@ -51,20 +57,19 @@ def fetch_data(pool):
         t0=pool.all_data[(sId, eId)]["time_range"][0]
         t1=pool.all_data[(sId, eId)]["time_range"][1]
 
-        tr=arcfetch(t0, t1, station)
+        tr=fetch_reftek_data(station, pool.pars, t0, t1 )
         if len(tr)==0:  #data not found
             continue
-
 
         if out_format.lower().strip() == "sac":
 
             p=os.path.join(out_path,  station["network"] +"."+ station["name"] + "." + t1.strftime("%Y%j%H%M%S"))
             add_sac_head(tr, station, event)
 
-            ##for masked trace data
-            for trace in tr:
-                if isinstance(trace.data, np.ma.masked_array):
-                    tr.data = tr.data.filled()
+            ##for masked trace data,  not needed anymore
+            # for trace in tr:
+            #     if isinstance(trace.data, np.ma.masked_array):
+            #         trace.data = trace.data.filled()
             tr.write(p+".sac", format="SAC")
         elif out_format.lower().strip() == "segy":
             pass
@@ -110,36 +115,51 @@ def add_sac_head(stream, station, event):
     stream[0].stats.network = station["network"]
     stream[0].stats.channel = "E"
 
-def fetch_reftek_data_old():
-    pass
-    # cmd = "arcfetch " + os.path.join(in_dir, stnet, stnm) + " -C *,*,*," + t0 + "," + t1 + " lqm.rt"
+def fetch_reftek_data(station,pars, t0, t1):
+    tr = obspy.Stream()
 
-    # status, output = subprocess.getstatusoutput(cmd)
-    # if "No archive error" in output:
-    #     print(cmd)
-    #     print(output)
-    #     print("Please check the data archive have the right archive.sta file. ")
-    #     print('If not, use commond "arcrebuild -Ypass " to rebuild it.')
-    #     exit(1)
+    #clean up the tmp_dir
+    for f in glob.glob(os.path.join(pars["tmp_dir"],  "*")):
+        os.remove(f)
 
-    # if not os.path.exists("lqm.rt"):
-    #     continue
+    in_dir = pars['input_dir']
+    out_dir = pars['output_dir']
+    out_format = pars['output_data_format']
+    out_path=os.path.join(out_dir, station["network"], station["name"])
 
-    # if out_format.lower().strip() == "sac":
-    #     cmd = "pas2sac lqm.rt " + out_path
-    #     status, output = subprocess.getstatusoutput(cmd)
+    t0=t0.strftime('%Y:%j:%H:%M:%S.%f')
+    t1=t1.strftime('%Y:%j:%H:%M:%S.%f')
+    cmd = "arcfetch " + os.path.join(in_dir, station["network"], station["name"]) + " -C *,*,*," + t0 + "," + t1 + " "+ os.path.join( pars["tmp_dir"],"lqm.rt")
 
-    # elif out_format.lower() == "asc":
-    #     os.system("pas2asc lqm.rt " + out_path)
-    # elif out_format.lower() == "msd":
-    #     os.system("pas2msd lqm.rt " + out_path)
-    # elif out_format.lower() == "segy":
-    #     os.system("pas2segy lqm.rt " + out_path)
+    status, output = subprocess.getstatusoutput(cmd)
+    if "No archive error" in output:
+        print(cmd)
+        print(output)
+        print("Please check the data archive have the right archive.sta file. ")
+        print('If not, use commond "arcrebuild -Ypass " to rebuild it.')
+        exit(1)
 
-    # os.remove("lqm.rt")
-    ####
 
-def arcfetch(t1, t2, station):
+    if out_format.lower().strip() == "sac":
+        cmd = "pas2sac "+ os.path.join( pars["tmp_dir"],"lqm.rt") +"  "+ pars["tmp_dir"]
+        status, output = subprocess.getstatusoutput(cmd)
+    elif out_format.lower() == "asc":
+        os.system("pas2asc "+os.path.join( pars["tmp_dir"],"lqm.rt") +"  "+ pars["tmp_dir"])
+    elif out_format.lower() == "msd":
+        os.system("pas2msd "+os.path.join( pars["tmp_dir"],"lqm.rt") + "  "+pars["tmp_dir"])
+    elif out_format.lower() == "segy":
+        os.system("pas2segy "+ os.path.join( pars["tmp_dir"],"lqm.rt")+ "  " + pars["tmp_dir"])
+
+    for f in glob.glob(os.path.join(pars["tmp_dir"], t0[0:4]+"*")):
+        tr+=obspy.read(f)
+
+
+
+    return  tr
+
+
+def fetch_data_by_obspy(t1, t2, station):
+    ##failed, due to the obspy do not fully support reftek data
     tr = obspy.Stream()
     file_list=find_match_files(t1,t2, station)
 
